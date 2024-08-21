@@ -22,6 +22,8 @@ class Gallery extends Component
     public $provincia;
     public $minAge = 0;
     public $maxAge = 100;
+    public $minHeight = 50;
+    public $maxHeight = 230;
 
     protected $updatesQueryString = [
         'category' => ['except' => ''],
@@ -32,6 +34,8 @@ class Gallery extends Component
         'provincia' => ['except' => ''],
         'minAge' => ['except' => ''],
         'maxAge' => ['except' => ''],
+        'minHeight' => ['except' => ''],
+        'maxHeight' => ['except' => ''],
     ];
 
     public function updatingCategory()
@@ -70,6 +74,16 @@ class Gallery extends Component
     }
 
     public function updatingMaxAge()
+    {
+        $this->resetPage();
+    }
+
+    public function updatingMinHeight()
+    {
+        $this->resetPage();
+    }
+
+    public function updatingMaxHeight()
     {
         $this->resetPage();
     }
@@ -132,6 +146,13 @@ class Gallery extends Component
 
             $query->whereHas('imageable', function($q) use ($minDate, $maxDate) {
                 $q->whereBetween('birthdate', [$minDate, $maxDate]);
+            });
+        }
+        
+        // filtro por altura
+        if ($this->minHeight !== null && $this->maxHeight !== null) {
+            $query->whereHasMorph('imageable', [Actor::class, Xtra::class], function($q, $type) {
+                $q->whereBetween('height', [$this->minHeight, $this->maxHeight]);
             });
         }
 
